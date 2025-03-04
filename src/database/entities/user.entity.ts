@@ -4,7 +4,9 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
@@ -46,8 +48,9 @@ export class User {
   @OneToMany(() => Post, (post) => post.user)
   posts: Post[];
 
-  @OneToMany(() => Address, (address) => address.user)
-  addresses: Address[];
+  @OneToOne(() => Address, (address) => address.user)
+  @JoinColumn()
+  address: Address;
 
   // @BeforeInsert()
   // @BeforeUpdate()

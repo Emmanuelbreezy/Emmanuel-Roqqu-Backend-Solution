@@ -10,23 +10,6 @@ import {
   getUsersService,
 } from "../services/user.service";
 
-export const createUserController = asyncHandler(
-  withValidation(
-    CreateUserDTO,
-    "body"
-  )(async (req: Request, res: Response) => {
-    const createUserDTO = req.dto as CreateUserDTO;
-    const { user } = await createUserService(createUserDTO);
-
-    return res.status(HTTPSTATUS.CREATED).json({
-      message: "User created successfully",
-      data: {
-        user,
-      },
-    });
-  })
-);
-
 export const getUsersController = asyncHandler(
   async (req: Request, res: Response) => {
     const pagination = {
@@ -67,6 +50,23 @@ export const getUserByIdController = asyncHandler(
 
     return res.status(HTTPSTATUS.OK).json({
       message: "User detailed fetched successfully",
+      data: {
+        user,
+      },
+    });
+  })
+);
+
+export const createUserController = asyncHandler(
+  withValidation(
+    CreateUserDTO,
+    "body"
+  )(async (req: Request, res: Response) => {
+    const createUserDTO = req.dto as CreateUserDTO;
+    const { user } = await createUserService(createUserDTO);
+
+    return res.status(HTTPSTATUS.CREATED).json({
+      message: "User created successfully",
       data: {
         user,
       },

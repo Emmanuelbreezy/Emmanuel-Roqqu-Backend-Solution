@@ -1,11 +1,10 @@
 import "dotenv/config";
+import path from "path";
 import { DataSource } from "typeorm";
 import { ENV } from "./env.config";
-import path from "path";
 
 export const getDatabaseConfig = () => {
   const isProduction = ENV.NODE_ENV === "production";
-  console.log(path.resolve(__dirname, "../database/db.sqlite"), "db");
 
   return new DataSource({
     type: "sqlite",

@@ -2,11 +2,9 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
-  BeforeInsert,
-  BeforeUpdate,
+  OneToOne,
 } from "typeorm";
 import { User } from "./user.entity";
 
@@ -15,16 +13,16 @@ export class Address {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: "varchar", length: 25 })
+  @Column({ length: 25 })
   houseNumber: string;
 
-  @Column({ type: "varchar", length: 255 })
+  @Column()
   street: string;
 
-  @Column({ type: "varchar", length: 100 })
+  @Column()
   city: string;
 
-  @Column({ type: "varchar", length: 100 })
+  @Column()
   state: string;
 
   @CreateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
@@ -33,6 +31,6 @@ export class Address {
   @UpdateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
   updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.addresses, { onDelete: "CASCADE" })
+  @OneToOne(() => User, (user) => user.address, { onDelete: "CASCADE" })
   user: User;
 }

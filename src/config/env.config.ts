@@ -5,15 +5,6 @@ const envConfig = () => ({
   PORT: getEnv("PORT", "5000"),
   BASE_PATH: getEnv("BASE_PATH", "/api"),
 
-  JWT_SECRET: getEnv("JWT_SECRET", "secert_jwt"),
-  JWT_EXPIRES_IN: getEnv("JWT_EXPIRES_IN", "1d"),
-
-  // DB_HOST: getEnv("DB_HOST"),
-  // DB_PORT: getEnv("DB_PORT"),
-  // DB_USERNAME: getEnv("DB_USERNAME"),
-  // DB_PASSWORD: getEnv("DB_PASSWORD"),
-  DATABASE_PATH: getEnv("DATABASE_PATH"),
-
   FRONTEND_ORIGIN: getEnv("FRONTEND_ORIGIN", "localhost"),
 });
 

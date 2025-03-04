@@ -8,6 +8,7 @@ import { asyncHandler } from "./middlewares/asyncHandler.middleware";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
 import { initializeDatabase } from "./database/database";
 import userRoutes from "./routes/user.route";
+import addressRoutes from "./routes/address.route";
 
 const app = express();
 const BASE_PATH = ENV.BASE_PATH;
@@ -35,6 +36,7 @@ app.get(
 );
 
 app.use(`${BASE_PATH}/users`, userRoutes);
+app.use(`${BASE_PATH}/addresses`, addressRoutes);
 
 app.use(errorHandler);
 
