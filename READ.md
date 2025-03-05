@@ -10,6 +10,10 @@ This is a backend API solution built using **Node.js, Express, and TypeORM** wit
 
 [🚀 Live URL](#) _(Replace this with your actual deployment URL)_
 
+## API Documentation
+
+[📄 Postman Documentation](https://documenter.getpostman.com/view/18783154/2sAYdkJ9qZ)
+
 ---
 
 ## 📌 Prerequisites
@@ -62,7 +66,6 @@ Create a `.env` file in the root directory and configure the following:
 ```sh
 PORT=8000
 NODE_ENV=development
-
 ```
 
 ---
@@ -116,7 +119,7 @@ npm run test:api
 npm run test:watch
 ```
 
-## 📌 Notes for the Interviewer
+## 📌 Notes
 
 - The project uses **TypeORM** for database operations.
 - Jest & Supertest are used for **testing**.
