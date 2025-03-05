@@ -7,8 +7,8 @@ import {
 
 const addressRoutes = Router();
 
+addressRoutes.get("/:userId", getAddressByUserIdController);
 addressRoutes.post("", createAddressController);
 addressRoutes.patch("/:userId", updateAddressController);
-addressRoutes.get("/:userId", getAddressByUserIdController);
 
 export default addressRoutes;

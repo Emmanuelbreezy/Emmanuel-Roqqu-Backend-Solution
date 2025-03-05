@@ -7,8 +7,8 @@ import {
 
 const postRoutes = Router();
 
-postRoutes.get("", getPostsByUserIdController);
 postRoutes.post("", createPostController);
+postRoutes.get("", getPostsByUserIdController);
 postRoutes.delete("/:id", deletePostController);
 
 export default postRoutes;

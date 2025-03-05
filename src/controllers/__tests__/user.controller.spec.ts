@@ -1,32 +1,34 @@
-import express from "express";
+import { Application } from "express";
 import request from "supertest";
 import { AppDataSource } from "../../config/database.config";
 import { HTTPSTATUS } from "../../config/http-status.config";
-import {
-  getUsersController,
-  getUserByIdController,
-  createUserController,
-} from "../../controllers/user.controller";
 import { ErrorCodeEnum } from "../../enums/error-code.enum";
-
-const app = express();
-app.use(express.json());
+import { createApp } from "../../app";
 
 jest.mock("../../config/database.config");
 
-app.get("/users", getUsersController);
-app.get("/users/:id", getUserByIdController);
-app.post("/users", createUserController);
-
 describe("User API", () => {
+  let app: Application;
+
+  beforeAll(() => {
+    app = createApp();
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   describe("GET /users", () => {
     it("should return a list of users with pagination", async () => {
-      const mockUsers = [{ id: 1, firstname: "John", lastname: "Doe" }];
-      const mockTotal = 1;
+      const mockUsers = [
+        { firstname: "Emmanuel", lastname: "Umeh", email: "emma@gmail.com" },
+        { firstname: "Jane", lastname: "Joy", email: "jane@gmail.com" },
+      ];
+      const mockTotal = 2;
 
       const mockFindAndCount = jest
         .fn()
@@ -36,7 +38,7 @@ describe("User API", () => {
       });
 
       const response = await request(app).get(
-        "/users?pageNumber=0&pageSize=10"
+        "/api/users?pageNumber=0&pageSize=10"
       );
 
       expect(response.status).toBe(HTTPSTATUS.OK);
@@ -53,13 +55,35 @@ describe("User API", () => {
     });
   });
 
+  describe("GET /users/count", () => {
+    it("should return the total number of users", async () => {
+      const mockCount = 10;
+      const mockGetCount = jest.fn().mockResolvedValue(mockCount);
+      AppDataSource.getRepository = jest.fn().mockReturnValue({
+        createQueryBuilder: jest.fn().mockReturnValue({
+          getCount: mockGetCount,
+        }),
+      });
+
+      const response = await request(app).get("/api/users/count");
+
+      expect(response.status).toBe(HTTPSTATUS.OK);
+      expect(response.body).toEqual({
+        message: "Total number of user fetched successfully",
+        data: {
+          total: mockCount,
+        },
+      });
+    });
+  });
+
   describe("GET /users/:id", () => {
     it("should return a user by ID", async () => {
       const mockUser = {
         id: 1,
-        firstname: "John",
-        lastname: "Doe",
-        email: "john@example.com",
+        firstname: "Emmanuel",
+        lastname: "Umeh",
+        email: "emma@gmail.com",
       };
 
       const mockFindOne = jest.fn().mockResolvedValue(mockUser);
@@ -67,7 +91,7 @@ describe("User API", () => {
         findOne: mockFindOne,
       });
 
-      const response = await request(app).get("/users/1");
+      const response = await request(app).get("/api/users/1");
 
       expect(response.status).toBe(HTTPSTATUS.OK);
       expect(response.body).toEqual({
@@ -83,7 +107,7 @@ describe("User API", () => {
         findOne: mockFindOne,
       });
 
-      const response = await request(app).get("/users/1");
+      const response = await request(app).get("/api/users/1");
 
       expect(response.status).toBe(HTTPSTATUS.NOT_FOUND);
       expect(response.body).toEqual({
@@ -97,9 +121,9 @@ describe("User API", () => {
     it("should create a new user", async () => {
       const mockUser = {
         id: 1,
-        firstname: "John",
-        lastname: "Doe",
-        email: "john@example.com",
+        firstname: "Emmanuel",
+        lastname: "Umeh",
+        email: "emma@gmail.com",
       };
 
       const mockFindOne = jest.fn().mockResolvedValue(null);
@@ -110,10 +134,10 @@ describe("User API", () => {
         save: mockSave,
       });
 
-      const response = await request(app).post("/users").send({
-        firstname: "John",
-        lastname: "Doe",
-        email: "john@example.com",
+      const response = await request(app).post("/api/users").send({
+        firstname: "Emmanuel",
+        lastname: "Umeh",
+        email: "emma@gmail.com",
       });
 
       expect(response.status).toBe(HTTPSTATUS.CREATED);
@@ -124,15 +148,15 @@ describe("User API", () => {
         },
       });
       expect(response.body.data.user).toBeDefined();
-      expect(response.body.data.user.email).toBe("john@example.com");
+      expect(response.body.data.user.email).toBe("emma@gmail.com");
     });
 
     it("should return 400 if user already exists", async () => {
       const mockUser = {
         id: 1,
-        firstname: "John",
-        lastname: "Doe",
-        email: "john@example.com",
+        firstname: "Emmanuel",
+        lastname: "Umeh",
+        email: "emma@gmail.com",
       };
 
       const mockFindOne = jest.fn().mockResolvedValue(mockUser);
@@ -140,10 +164,10 @@ describe("User API", () => {
         findOne: mockFindOne,
       });
 
-      const response = await request(app).post("/users").send({
-        firstname: "John",
-        lastname: "Doe",
-        email: "john@example.com",
+      const response = await request(app).post("/api/users").send({
+        firstname: "Emmanuel",
+        lastname: "Umeh",
+        email: "emma@gmail.com",
       });
       expect(response.status).toBe(HTTPSTATUS.BAD_REQUEST);
       expect(response.body).toEqual({

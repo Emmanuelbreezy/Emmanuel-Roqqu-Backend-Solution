@@ -1,0 +1,138 @@
+import request from "supertest";
+import { Application } from "express";
+import { AppDataSource } from "../../config/database.config";
+import { HTTPSTATUS } from "../../config/http-status.config";
+import { ErrorCodeEnum } from "../../enums/error-code.enum";
+import { User } from "../../database/entities/user.entity";
+import { createApp } from "../../app";
+
+describe("User API", () => {
+  let app: Application;
+
+  beforeAll(async () => {
+    await AppDataSource.initialize();
+    app = createApp();
+  });
+
+  afterAll(async () => {
+    await AppDataSource.destroy();
+  });
+
+  beforeEach(async () => {
+    await AppDataSource.getRepository(User).clear();
+  });
+
+  describe("GET /users", () => {
+    it("should return a list of users with pagination", async () => {
+      const userRepository = AppDataSource.getRepository(User);
+      await userRepository.save([
+        { firstname: "Emmanuel", lastname: "Umeh", email: "emma@gmail.com" },
+        { firstname: "Jane", lastname: "Joy", email: "jane@gmail.com" },
+      ]);
+
+      const response = await request(app).get(
+        `/api/users?pageNumber=0&pageSize=10`
+      );
+
+      expect(response.status).toBe(HTTPSTATUS.OK);
+      expect(response.body).toEqual({
+        message: "All users fetched successfully",
+        users: expect.arrayContaining([
+          expect.objectContaining({
+            firstname: "Emmanuel",
+            lastname: "Umeh",
+            email: "emma@gmail.com",
+          }),
+          expect.objectContaining({
+            firstname: "Jane",
+            lastname: "Joy",
+            email: "jane@gmail.com",
+          }),
+        ]),
+        pagination: {
+          totalElements: 2,
+          pageNumber: 0,
+          pageSize: 10,
+          totalPages: 1,
+        },
+      });
+    });
+  });
+
+  describe("GET /users/:id", () => {
+    it("should return a user by ID", async () => {
+      const userRepository = AppDataSource.getRepository(User);
+      const user = await userRepository.save({
+        firstname: "Emmanuel",
+        lastname: "Umeh",
+        email: "emma@gmail.com",
+      });
+      const response = await request(app).get(`/api/users/${user.id}`);
+
+      expect(response.status).toBe(HTTPSTATUS.OK);
+      expect(response.body).toEqual({
+        message: "User detailed fetched successfully",
+        data: {
+          user: expect.objectContaining({
+            id: user.id,
+            firstname: "Emmanuel",
+            lastname: "Umeh",
+            email: "emma@gmail.com",
+          }),
+        },
+      });
+    });
+
+    it("should return 404 if user is not found", async () => {
+      const response = await request(app).get(`/api/users/999`);
+      expect(response.status).toBe(HTTPSTATUS.NOT_FOUND);
+      expect(response.body).toEqual({
+        message: "User not found",
+        errorCode: ErrorCodeEnum.RESOURCE_NOT_FOUND,
+      });
+    });
+  });
+
+  describe("POST /users", () => {
+    it("should create a new user", async () => {
+      const response = await request(app).post(`/api/users`).send({
+        firstname: "Emmanuel",
+        lastname: "Umeh",
+        email: "emma@gmail.com",
+      });
+
+      expect(response.status).toBe(HTTPSTATUS.CREATED);
+      expect(response.body).toEqual({
+        message: "User created successfully",
+        data: {
+          user: expect.objectContaining({
+            firstname: "Emmanuel",
+            lastname: "Umeh",
+            email: "emma@gmail.com",
+          }),
+        },
+      });
+    });
+
+    it("should return 400 if user already exists", async () => {
+      const userRepository = AppDataSource.getRepository(User);
+      await userRepository.save({
+        firstname: "Emmanuel",
+        lastname: "Umeh",
+        email: "emma@gmail.com",
+      });
+
+      const response = await request(app).post(`/api/users`).send({
+        firstname: "Emmanuel",
+        lastname: "Umeh",
+        email: "emma@gmail.com",
+      });
+
+      expect(response.status).toBe(HTTPSTATUS.BAD_REQUEST);
+      expect(response.body).toEqual({
+        message: "User already exists",
+        errorCode: ErrorCodeEnum.VALIDATION_ERROR,
+      });
+    });
+  });
+});

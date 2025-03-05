@@ -1,21 +1,30 @@
+import request from "supertest";
 import { AppDataSource } from "../../config/database.config";
-import {
-  getAddressByUserIdService,
-  createAddressService,
-  updateAddressService,
-} from "../address.service";
 import { Address } from "../../database/entities/address.entity";
 import { User } from "../../database/entities/user.entity";
-import { BadRequestException, NotFoundException } from "../../utils/app-error";
+import { HTTPSTATUS } from "../../config/http-status.config";
+import { createApp } from "../../app";
+import { Application } from "express";
+import { ErrorCodeEnum } from "../../enums/error-code.enum";
 
 jest.mock("../../config/database.config");
 
-describe("Address Service", () => {
+describe("Addresses API", () => {
+  let app: Application;
+
+  beforeAll(() => {
+    app = createApp();
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
+  });
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  describe("getAddressByUserIdService", () => {
+  describe("GET /addresses/:userId", () => {
     it("should return the address for a user", async () => {
       const mockAddress = {
         id: 1,
@@ -30,33 +39,45 @@ describe("Address Service", () => {
           email: "emma@gmail.com",
         },
       };
-
       const mockFindOne = jest.fn().mockResolvedValue(mockAddress);
       AppDataSource.getRepository = jest.fn().mockReturnValue({
         findOne: mockFindOne,
       });
 
-      const result = await getAddressByUserIdService(1);
+      const response = await request(app).get("/api/addresses/1");
 
-      expect(result).toEqual(mockAddress);
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({
+        message: "Address fetched successfully",
+        data: { address: mockAddress },
+      });
       expect(mockFindOne).toHaveBeenCalledWith({
         where: { user: { id: 1 } },
         relations: ["user"],
       });
     });
-    it("should throw NotFoundException if address is not found", async () => {
+
+    it("should return 404 if address is not found", async () => {
       const mockFindOne = jest.fn().mockResolvedValue(null);
       AppDataSource.getRepository = jest.fn().mockReturnValue({
         findOne: mockFindOne,
       });
 
-      await expect(getAddressByUserIdService(1)).rejects.toThrow(
-        NotFoundException
-      );
+      const response = await request(app).get("/api/addresses/1");
+
+      expect(response.status).toBe(HTTPSTATUS.NOT_FOUND);
+      expect(response.body).toEqual({
+        message: "Address not found for the user",
+        errorCode: ErrorCodeEnum.RESOURCE_NOT_FOUND,
+      });
+      expect(mockFindOne).toHaveBeenCalledWith({
+        where: { user: { id: 1 } },
+        relations: ["user"],
+      });
     });
   });
 
-  describe("createAddressService", () => {
+  describe("POST /addresses", () => {
     it("should create a new address for a user", async () => {
       const mockUser = {
         id: 1,
@@ -77,7 +98,6 @@ describe("Address Service", () => {
 
       const mockCreate = jest.fn().mockReturnValue(mockAddress);
       const mockSave = jest.fn().mockResolvedValue(mockAddress);
-
       AppDataSource.getRepository = jest.fn().mockImplementation((entity) => {
         if (entity === User) {
           return {
@@ -91,7 +111,8 @@ describe("Address Service", () => {
           };
         }
       });
-      const result = await createAddressService({
+
+      const response = await request(app).post("/api/addresses").send({
         userId: 1,
         houseNumber: "06",
         street: "Babs Itnola",
@@ -99,32 +120,33 @@ describe("Address Service", () => {
         state: "Lagos",
       });
 
-      expect(result).toEqual(mockAddress);
-      expect(mockFindOneBy).toHaveBeenCalledWith({ id: 1 });
-      expect(mockFindOne).toHaveBeenCalledWith({
-        where: { user: { id: 1 } },
+      expect(response.status).toBe(HTTPSTATUS.CREATED);
+      expect(response.body).toEqual({
+        message: "Address created successfully",
+        data: { address: mockAddress },
       });
-      expect(mockSave).toHaveBeenCalled();
     });
 
-    it("should throw NotFoundException if user is not found", async () => {
+    it("should return 404 if user is not found", async () => {
       const mockFindOneBy = jest.fn().mockResolvedValue(null);
       AppDataSource.getRepository = jest.fn().mockReturnValue({
         findOneBy: mockFindOneBy,
       });
-
-      await expect(
-        createAddressService({
-          userId: 1,
-          houseNumber: "06",
-          street: "Babs Itnola",
-          city: "Ikeja",
-          state: "Lagos",
-        })
-      ).rejects.toThrow(NotFoundException);
+      const response = await request(app).post("/api/addresses").send({
+        userId: 1,
+        houseNumber: "06",
+        street: "Babs Itnola",
+        city: "Ikeja",
+        state: "Lagos",
+      });
+      expect(response.status).toBe(HTTPSTATUS.NOT_FOUND);
+      expect(response.body).toEqual({
+        message: "User not found",
+        errorCode: ErrorCodeEnum.RESOURCE_NOT_FOUND,
+      });
     });
 
-    it("should throw BadRequestException if user already has an address", async () => {
+    it("should return 400 if user already has an address", async () => {
       const mockUser = {
         id: 1,
         firstname: "Emmanuel",
@@ -139,6 +161,7 @@ describe("Address Service", () => {
         state: "Lagos",
         user: mockUser,
       };
+
       const mockFindOneBy = jest.fn().mockResolvedValue(mockUser);
       const mockFindOne = jest.fn().mockResolvedValue(mockAddress);
       AppDataSource.getRepository = jest.fn().mockImplementation((entity) => {
@@ -153,19 +176,23 @@ describe("Address Service", () => {
         }
       });
 
-      await expect(
-        createAddressService({
-          userId: 1,
-          houseNumber: "06",
-          street: "Babs Itnola",
-          city: "Ikeja",
-          state: "Lagos",
-        })
-      ).rejects.toThrow(BadRequestException);
+      const response = await request(app).post("/api/addresses").send({
+        userId: 1,
+        houseNumber: "06",
+        street: "Babs Itnola",
+        city: "Ikeja",
+        state: "Lagos",
+      });
+
+      expect(response.status).toBe(HTTPSTATUS.BAD_REQUEST);
+      expect(response.body).toEqual({
+        message: "User already has an address",
+        errorCode: ErrorCodeEnum.VALIDATION_ERROR,
+      });
     });
   });
 
-  describe("updateAddressService", () => {
+  describe("PATCH /addresses/:userId", () => {
     it("should update the address for a user", async () => {
       const mockAddress = {
         id: 1,
@@ -173,7 +200,12 @@ describe("Address Service", () => {
         street: "Babs Itnola",
         city: "Ikeja",
         state: "Lagos",
-        user: { id: 1 },
+        user: {
+          id: 1,
+          firstname: "Emmanuel",
+          lastname: "Umeh",
+          email: "emma@gmail.com",
+        },
       };
 
       const mockFindOne = jest.fn().mockResolvedValue(mockAddress);
@@ -183,34 +215,36 @@ describe("Address Service", () => {
         save: mockSave,
       });
 
-      const result = await updateAddressService(1, {
+      const response = await request(app).patch("/api/addresses/1").send({
         houseNumber: "16",
         street: "Itnola Babs ",
         city: "Ikeja",
         state: "Lagos",
       });
 
-      expect(result).toEqual(mockAddress);
-      expect(mockFindOne).toHaveBeenCalledWith({
-        where: { user: { id: 1 } },
+      expect(response.status).toBe(HTTPSTATUS.OK);
+      expect(response.body).toEqual({
+        message: "Address updated successfully",
+        data: { address: mockAddress },
       });
-      expect(mockSave).toHaveBeenCalled();
     });
 
-    it("should throw NotFoundException if address is not found", async () => {
+    it("should return 404 if address is not found", async () => {
       const mockFindOne = jest.fn().mockResolvedValue(null);
       AppDataSource.getRepository = jest.fn().mockReturnValue({
         findOne: mockFindOne,
       });
-
-      await expect(
-        updateAddressService(1, {
-          houseNumber: "16",
-          street: "Itnola Babs ",
-          city: "Ikeja",
-          state: "Lagos",
-        })
-      ).rejects.toThrow(NotFoundException);
+      const response = await request(app).patch("/api/addresses/1").send({
+        houseNumber: "16",
+        street: "Itnola Babs ",
+        city: "Ikeja",
+        state: "Lagos",
+      });
+      expect(response.status).toBe(HTTPSTATUS.NOT_FOUND);
+      expect(response.body).toEqual({
+        message: "Address not found for the user",
+        errorCode: ErrorCodeEnum.RESOURCE_NOT_FOUND,
+      });
     });
   });
 });
