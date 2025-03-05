@@ -15,15 +15,6 @@ This is a backend API solution built using **Node.js, Express, and TypeORM** wit
 [📄 Postman Documentation](https://documenter.getpostman.com/view/18783154/2sAYdkJ9qZ)
 
 ---
-
-## 📌 Prerequisites
-
-Before running the project, ensure you have the following installed:
-
-- **Node.js** (v18 or later recommended)
-- **npm** (comes with Node.js)
-- **SQLite3** (for local database testing)
-
 ### Clone the Repository
 
 ```sh
