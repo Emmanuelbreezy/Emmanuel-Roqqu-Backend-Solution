@@ -8,7 +8,7 @@ This is a backend API solution built using **Node.js, Express, and TypeORM** wit
 
 ## Live URL
 
-[🚀 Live URL](#) _(Replace this with your actual deployment URL)_
+[🚀 Live URL](https://api-roqqu.onrender.com) #https://api-roqqu.onrender.com
 
 ## API Documentation
 
