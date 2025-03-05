@@ -6,7 +6,6 @@ import { NotFoundException } from "../utils/app-error";
 
 export const getPostsByUserIdService = async (userId?: number) => {
   const postRepository = AppDataSource.getRepository(Post);
-
   const queryBuilder = postRepository
     .createQueryBuilder("post")
     .leftJoinAndSelect("post.user", "user")
