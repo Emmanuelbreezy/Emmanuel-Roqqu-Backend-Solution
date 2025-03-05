@@ -94,12 +94,6 @@ The API will be available at `http://localhost:8000` (or your configured port).
 
 The project includes **unit tests** and **API tests** using **Jest & Supertest**.
 
-### Run All Tests
-
-```sh
-npm test
-```
-
 ### Run Unit Tests Only
 
 ```sh
@@ -111,13 +105,6 @@ npm run test:unit
 ```sh
 npm run test:api
 ```
-
-### Watch Mode (Auto-run on changes)
-
-```sh
-npm run test:watch
-```
-
 
 
 🎯 _Thank You!_ 🚀
