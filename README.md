@@ -14,10 +14,6 @@ This is a backend API solution built using **Node.js, Express, and TypeORM** wit
 
 [📄 Postman Documentation](https://documenter.getpostman.com/view/18783154/2sAYdkJ9qZ)
 
-## API Documentation
-
-[📄 Postman Documentation](https://documenter.getpostman.com/view/18783154/2sAYdkJ9qZ)
-
 ---
 
 ## 📌 Prerequisites
