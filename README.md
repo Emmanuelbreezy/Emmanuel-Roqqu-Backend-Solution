@@ -14,6 +14,14 @@ This is a backend API solution built using **Node.js, Express, and TypeORM** wit
 
 [📄 Postman Documentation](https://documenter.getpostman.com/view/18783154/2sAYdkJ9qZ)
 
+## 📌 Notes
+
+- The project uses **TypeORM** for database operations.
+- Jest & Supertest are used for **testing**.
+- **SQLite** is used as the database for easy local testing.
+- The API follows **Best practices** with proper error handling.
+---
+
 ---
 ### Clone the Repository
 
@@ -110,13 +118,6 @@ npm run test:api
 npm run test:watch
 ```
 
-## 📌 Notes
 
-- The project uses **TypeORM** for database operations.
-- Jest & Supertest are used for **testing**.
-- **SQLite** is used as the database for easy local testing.
-- The API follows **RESTful best practices** with proper error handling.
-
----
 
 🎯 _Thank You!_ 🚀
