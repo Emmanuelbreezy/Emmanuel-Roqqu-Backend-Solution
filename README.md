@@ -8,7 +8,7 @@ This is a backend API solution built using **Node.js, Express, and TypeORM** wit
 
 ## Live URL
 
-[🚀 Live URL](#) *(Replace this with your actual deployment URL)*
+[🚀 Live URL](#) _(Replace this with your actual deployment URL)_
 
 ## API Documentation
 
@@ -132,7 +132,4 @@ npm run test:watch
 
 ---
 
-🎯 *Thank You!* 🚀
-
-
-
+🎯 _Thank You!_ 🚀
