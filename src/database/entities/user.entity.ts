@@ -1,6 +1,4 @@
 import {
-  // BeforeInsert,
-  // BeforeUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -10,7 +8,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-//import { compareValue, hashValue } from "../../utils/bcrypt";
 import { Post } from "./post.entity";
 import { Address } from "./address.entity";
 
@@ -45,12 +42,12 @@ export class User {
   @UpdateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
   updatedAt: Date;
 
-  @OneToMany(() => Post, (post) => post.user)
-  posts: Post[];
-
   @OneToOne(() => Address, (address) => address.user)
   @JoinColumn()
   address: Address;
+
+  @OneToMany(() => Post, (post) => post.user)
+  posts: Post[];
 
   // @BeforeInsert()
   // @BeforeUpdate()

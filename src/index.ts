@@ -1,7 +1,6 @@
 import "dotenv/config";
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
-import passport from "passport";
 import { ENV } from "./config/env.config";
 import { HTTPSTATUS } from "./config/http-status.config";
 import { asyncHandler } from "./middlewares/asyncHandler.middleware";
@@ -9,15 +8,13 @@ import { errorHandler } from "./middlewares/errorHandler.middleware";
 import { initializeDatabase } from "./database/database";
 import userRoutes from "./routes/user.route";
 import addressRoutes from "./routes/address.route";
+import postRoutes from "./routes/post.route";
 
 const app = express();
 const BASE_PATH = ENV.BASE_PATH;
 
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true }));
-
-app.use(passport.initialize());
 
 app.use(
   cors({
@@ -37,6 +34,7 @@ app.get(
 
 app.use(`${BASE_PATH}/users`, userRoutes);
 app.use(`${BASE_PATH}/addresses`, addressRoutes);
+app.use(`${BASE_PATH}/posts`, postRoutes);
 
 app.use(errorHandler);
 

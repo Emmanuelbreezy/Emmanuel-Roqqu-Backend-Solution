@@ -17,7 +17,7 @@ export class Post {
   title: string;
 
   @Column({ type: "text" })
-  content: string;
+  body: string;
 
   @CreateDateColumn({ type: "datetime", default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;

@@ -11,7 +11,11 @@
     "db:generate": "npm run typeorm -- migration:generate src/database/migrations/NewMigration",
     "db:migrate": "npm run typeorm -- migration:run",
     "db:revert": "npm run typeorm -- migration:revert",
-    "db:drop": "npm run typeorm -- schema:drop"
+    "db:drop": "npm run typeorm -- schema:drop",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
+    "test:unit": "jest --testPathPattern=services/__tests__",
+    "test:api": "jest --testPathPattern=controllers/__tests__",
+    "test:watch": "jest --watch"
   },
   "keywords": [],
   "author": "",
@@ -34,8 +38,13 @@
     "@types/cors": "^2.8.17",
     "@types/dotenv": "^8.2.3",
     "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.14",
     "@types/node": "^22.13.4",
     "@types/passport": "^1.0.17",
+    "@types/supertest": "^6.0.2",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.6",
     "ts-node-dev": "^2.0.0",
     "typeorm-ts-node-commonjs": "^0.3.20",
     "typescript": "^5.7.3"

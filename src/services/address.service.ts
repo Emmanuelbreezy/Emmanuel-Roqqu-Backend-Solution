@@ -12,6 +12,7 @@ export const getAddressByUserIdService = async (userId: number) => {
 
   const address = await addressRepository.findOne({
     where: { user: { id: userId } },
+    relations: ["user"],
   });
 
   if (!address) {

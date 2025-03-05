@@ -41,7 +41,7 @@ export const getUserByIdService = async (userId: number) => {
   const userRepository = AppDataSource.getRepository(User);
   const user = await userRepository.findOne({
     where: { id: userId },
-    relations: ["addresses"],
+    relations: ["address"],
   });
 
   if (!user) {

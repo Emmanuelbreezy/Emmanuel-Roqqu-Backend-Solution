@@ -1,22 +1,6 @@
 import { ErrorRequestHandler, Response } from "express";
-import { ValidationError } from "class-validator";
 import { HTTPSTATUS } from "../config/http-status.config";
 import { AppError } from "../utils/app-error";
-import { ErrorCodeEnum } from "../enums/error-code.enum";
-
-export const formatValidationError = (
-  res: Response,
-  errors: ValidationError[]
-) => {
-  return res.status(HTTPSTATUS.BAD_REQUEST).json({
-    message: "Validation failed",
-    errorCode: ErrorCodeEnum.VALIDATION_ERROR,
-    errors: errors.map((err) => ({
-      field: err.property,
-      message: err.constraints,
-    })),
-  });
-};
 
 export const errorHandler: ErrorRequestHandler = (
   error,
